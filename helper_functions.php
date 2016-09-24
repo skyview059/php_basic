@@ -28,7 +28,7 @@ function subjects( $checked = []){
     $checkbox = '';
     foreach($subjects as $key=>$subject){
         $checkbox .= '<label class="checkbox">';
-        $checkbox .= '<input type="checkbox" ';
+        $checkbox .= '<input type="checkbox" name="subjects[]" ';
         
         
         $checkbox .= (in_array($key, $checked)) ? 'checked="checked"' : '';
@@ -40,4 +40,33 @@ function subjects( $checked = []){
         $checkbox .= $subject . '</label>';
     }        
     return $checkbox;
+}
+
+
+function insertSubject($studentID = 0, $subjects = array()){
+    
+    if($studentID){
+        foreach($subjects as $subjectID){
+            //print_r( $subjectID );
+            insertIngleSubject($studentID, $subjectID);
+        }
+    }   
+}
+
+
+function insertIngleSubject($studentID = 0, $subjectID = 0){
+    
+    if( $studentID == 0 or  $subjectID  == 0){
+        return false;
+    }
+    
+    $db = new CRUD();
+    $db->query("INSERT INTO `subjects` SET"
+            . "`studentID` = :studentID,"
+            . "`subjectID` = :subjectID");
+    
+    $db->bind(':studentID', $studentID);
+    $db->bind(':subjectID', $subjectID);
+    $db->execute();  
+    return true;
 }
