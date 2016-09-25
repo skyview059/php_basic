@@ -2,176 +2,63 @@
 require_once ( __DIR__ . '/helper_functions.php');
 require_once('db_con.php');
 require_once('class.crud.php');
-
-
-if (isset($_POST['submit'])) {
-    $name       = $_POST['s_name'];
-    $class      = $_POST['class'];
-    $dob        = $_POST['year'] .'-'. $_POST['month'] .'-'. $_POST['day'];
-    $address    = $_POST['address'];
-    $department = $_POST['department'];
-    $subjects   = $_POST['subjects'];
-    
-
-    $db = new CRUD();
-    $db->query("INSERT INTO `student` SET"
-            . "`name` = :name,"
-            . "`class` = :class, "
-            . "`dob`   = :dob,"
-            . "`address` = :address,"
-            . "`department` = :department");
-
-    $db->bind(':name', $name);
-    $db->bind(':class', $class);
-    $db->bind(':dob', $dob);
-    $db->bind(':address', $address);
-    $db->bind(':department', $department);
-    $db->execute();
-
-    $studentID = $db->lastInsertId();
-    
-    insertSubject($studentID, $subjects);
-    
-    echo 'Please Check DB';
-   
-    
-    
-}
+require_once 'header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Bootstrap 3, from LayoutIt!</title>
+    <div class="container-fluid">
+    <div class="row">
 
-        <meta name="description" content="Source code generated using layoutit.com">
-        <meta name="author" content="LayoutIt!">
+        <h3 class="text-center">All Students List</h3>
+        <hr>
 
-        <link href="css/bootstrap.min.css" rel="stylesheet">
-        <link href="css/style.css" rel="stylesheet">
+    <div class="col-md-12">
+    <table class="table table-bordered table-condensed">
+    <thead>
+    <tr class="success">
+        <th>Name</th>
+        <th>class</th>
+        <th>date of birth</th>
+        <th>subjects</th>
+        <th>address</th>
+        <th>department</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+        <tbody>
 
-    </head>
-    <body>
+    <?php
+    $db = new CRUD();
+    foreach($db->showData('student') as $value) {
 
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <h3>
-                        Student Registration Form
-                    </h3>
-
-
-
-                    <form class="form-horizontal" action="index.php" method="post">
-                        <fieldset>
-                            <div id="legend" class="">
-                                <legend class="">Form Name</legend>
-                            </div>
-                            <div class="form-group">
-
-                                <!-- Text input-->
-                                <label class="col-md-4 control-label" for="input01">Name</label>
-                                <div class="col-md-4">
-                                    <input type="text" placeholder="" class="form-control input-md" name="s_name">
-                                    <p class="help-block"></p>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-
-                                <!-- Select Basic -->
-                                <label class="col-md-4 control-label">Class</label>
-                                <div class="col-md-4">
-                                    <select class="form-control input-md" name="class">
-                                        <option>Enter</option>
-                                        <option>Your</option>
-                                        <option>Options</option>
-                                        <option>Here!</option></select>
-                                </div>
-
-                            </div>
+        echo '<tr class="success">';
+        echo '<td>'.$value['name'].'</td>';
+        echo '<td>'.$value['class'].'</td>';
+        echo '<td>'.$value['dob'].'</td>';
+        // echo '<td>'.$value['id'].'</td>';
+        $sID = $value['id'];
 
 
-                            <div class="form-group">
-
-                                <!-- Select Basic -->
-                                <label class="col-md-4 control-label">DOB</label>
-                                <div class='col-md-8'>
-                                    <div class="col-md-2">
-                                        <select name="day" class="form-control input-md" name="day">
-                                            <option>DD</option>
-<?php echo dropdown(1, 31); ?>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <select class="form-control input-md" name="month">
-                                            <option>MM</option>
-<?php echo dropdown(1, 12); ?>
-                                        </select>  
-                                    </div>    
+        echo '<td>';
+        print_r(  getStudentSubjects( $sID ));
+       
+        echo '</td>';
 
 
-                                    <div class="col-md-2">
-                                        <select class="form-control input-md" name="year">
-                                            <option>YYYY</option>
-<?php echo dropdown(1990, 2000, 1, 1997); ?>
-                                        </select>  
-                                    </div> 
+        echo '<td>'.$value['address'].'</td>';
+        echo '<td>'.$value['department'].'</td>';
 
+        echo '<td><a href="update.php?id=' . $value['id'] . '" class="btn btn-info" style="width:70px;">Edit</a>
+                      <a href="delete.php?id=' . $value['id'] . '" class="btn btn-danger" style="width:70px;">Delete</a></td>';
+        echo '</tr>';
 
+    }
+    ?>
+        </tbody>
+</table>
+    </div>
+    </div>
+    </div>
 
-
-                                </div>
-
-                            </div>
-
-                            <div class="form-group">
-                                <label class="col-md-4 control-label">Subjects</label>
-                                <div class="col-md-4">
-<?php echo subjects(); ?>
-                                </div>
-
-                            </div>
-
-                            <div class="form-group">
-
-                                <!-- Textarea -->
-                                <label class="col-md-4 control-label">Address</label>
-                                <div class="col-md-4">
-                                    <div class="textarea">
-                                        <textarea class="form-control" name="address"> </textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-
-                                <!-- Select Basic -->
-                                <label class="col-md-4 control-label">Department</label>
-                                <div class="col-md-4">
-                                    <select class="form-control input-md" name="department">
-                                        <option>Enter</option>
-                                        <option>Your</option>
-                                        <option>Options</option>
-                                        <option>Here!</option></select>
-                                </div>
-
-                            </div>
-
-                            <input type="submit" name="submit" value="submit">
-
-                        </fieldset>
-                    </form>
-
-                </div>
-            </div>
-        </div>
-
-        <script src="js/jquery.min.js"></script>
-        <script src="js/bootstrap.min.js"></script>
-        <script src="js/scripts.js"></script>
-    </body>
-</html>
+<?php
+require_once 'footer.php';
+?>

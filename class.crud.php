@@ -108,5 +108,26 @@ class CRUD{
     public function debugDumpParams(){
         return $this->stmt->debugDumpParams();
     }
-			
+
+    public function showData($table){
+
+         $sql="SELECT * FROM $table";
+         $q = $this->dbh->query($sql) or die("failed!");
+         while($r = $q->fetch(PDO::FETCH_ASSOC)){
+         $data[]=$r;
+         }
+         return $data;
+     }
+
+    public function deleteData($id,$table){
+
+         $sql="DELETE FROM $table WHERE id=:id";
+         $q = $this->dbh->prepare($sql);
+         $q->execute(array(':id'=>$id));
+         return true;
+
+ }
+
+
+
 }

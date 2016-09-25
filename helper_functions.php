@@ -17,7 +17,7 @@ function dropdown($i=0,$end=12,$incr=1,$selected=0){
 }
 
 
-function subjects( $checked = []){	
+function subjects( $checked = [], $return_type = 'Checkbox'){	
     $subjects = [
         1 => 'English',
         2 => 'Bangla',
@@ -26,19 +26,28 @@ function subjects( $checked = []){
         5 => 'Physics'
     ];
     $checkbox = '';
-    foreach($subjects as $key=>$subject){
-        $checkbox .= '<label class="checkbox">';
-        $checkbox .= '<input type="checkbox" name="subjects[]" ';
-        
-        
-        $checkbox .= (in_array($key, $checked)) ? 'checked="checked"' : '';
-        
-        
-        
-        
-        $checkbox .= 'value="'. $key .' ">';
-        $checkbox .= $subject . '</label>';
-    }        
+    $comman = array();
+    if($return_type == 'Comma'){
+        foreach( $subjects as $key=>$subject ){
+            if(in_array($key, $checked)) {
+               $comman[]  =  $subject;
+            } 
+        }
+    $checkbox  =  implode(', ', $comman);
+
+    } else {
+        foreach($subjects as $key=>$subject){
+            $checkbox .= '<label class="checkbox">';
+            $checkbox .= '<input type="checkbox" name="subjects[]" ';
+            $checkbox .= (in_array($key, $checked)) ? 'checked="checked"' : '';
+            $checkbox .= 'value="'. $key .' ">';
+            $checkbox .= $subject . '</label>';
+        }
+    }
+
+
+   
+           
     return $checkbox;
 }
 
@@ -48,13 +57,13 @@ function insertSubject($studentID = 0, $subjects = array()){
     if($studentID){
         foreach($subjects as $subjectID){
             //print_r( $subjectID );
-            insertIngleSubject($studentID, $subjectID);
+            insertSingleSubject($studentID, $subjectID);
         }
     }   
 }
 
 
-function insertIngleSubject($studentID = 0, $subjectID = 0){
+function insertSingleSubject($studentID = 0, $subjectID = 0){
     
     if( $studentID == 0 or  $subjectID  == 0){
         return false;
@@ -70,3 +79,21 @@ function insertIngleSubject($studentID = 0, $subjectID = 0){
     $db->execute();  
     return true;
 }
+
+
+function getStudentSubjects($studentID = 0){
+    
+    if( $studentID == 0){
+        return false;
+    }
+    
+    $db = new CRUD();
+    $data = $db->get_results("SELECT * FROM `subjects`  WHERE `studentID` = $studentID");        
+    $array  = [];
+    
+    foreach($data as $row ){
+        $array[] = $row->subjectID; 
+   }
+   return subjects( $array, 'Comma') ;
+}
+
